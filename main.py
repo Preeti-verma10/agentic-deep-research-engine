@@ -11,41 +11,91 @@ def main():
     research_result = researcher.research(query)
 
     documents = research_result["documents"]
+
     plan = research_result["plan"]
+
+    sections = research_result["sections"]
 
     report_agent = ReportAgent()
 
     report_path = report_agent.generate_report(
         query,
         documents,
-        plan
+        plan,
+        sections
     )
 
-    print(f"\nReport Saved: {report_path}\n")
+    print(f"\nReport Saved: {report_path}")
 
-    print("\n===== RESULTS =====\n")
+    print("\n==============================")
+    print("RESEARCH SUMMARY")
+    print("==============================")
 
-    for i, doc in enumerate(documents, start=1):
+    print("\nResearch Query:")
+    print(query)
 
-        print(f"\nSource {i}:")
+    print("\nResearch Plan:\n")
+
+    for i, question in enumerate(
+        plan["sub_questions"],
+        start=1
+    ):
+        print(f"{i}. {question}")
+
+    print("\n==============================")
+
+    for i, section in enumerate(
+        sections,
+        start=1
+    ):
+
+        print(f"\nQuestion {i}")
+        print("-" * 60)
+
+        print(section["question"])
+
+        print("\nAnswer:\n")
+
+        if section["answer"]:
+            print(section["answer"][:700])
+        else:
+            print("No answer generated.")
+
+        print("\nSources:")
+
+        if len(section["documents"]) == 0:
+            print("No sources.")
+
+        else:
+
+            for doc in section["documents"]:
+
+                print(doc["source"])
+
+    print("\n==============================")
+    print("Evidence Details")
+    print("==============================")
+
+    for i, doc in enumerate(
+        documents,
+        start=1
+    ):
+
+        print(f"\nSource {i}")
         print(doc["source"])
-
-        print("\nContent Preview:\n")
-        print(doc["content"][:500])
 
         print("\nEvidence:\n")
 
         for item in doc["evidence"]:
 
-            print("\nEvidence:")
             print(item["evidence"][:200])
 
             print(
-                f"Confidence: {item['confidence']}"
+                f"Confidence : {item['confidence']}"
             )
 
             print(
-                f"Verification: {item['verification_status']}"
+                f"Verification : {item['verification_status']}"
             )
 
             print(
@@ -55,7 +105,9 @@ def main():
                 f"H:{item['helpfulness']}"
             )
 
-        print("-" * 50)
+            print()
+
+        print("-" * 60)
 
 
 if __name__ == "__main__":

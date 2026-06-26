@@ -1,7 +1,7 @@
 import re
 
 
-def chunk_text(text, chunk_size=1000):
+def chunk_text(text, chunk_size=1200):
 
     sentences = re.split(
         r'(?<=[.!?])\s+',
@@ -15,8 +15,8 @@ def chunk_text(text, chunk_size=1000):
     for sentence in sentences:
 
         if (
-            len(current_chunk) +
-            len(sentence)
+            len(current_chunk)
+            + len(sentence)
             < chunk_size
         ):
 
@@ -73,13 +73,15 @@ def retrieve_relevant_chunks(
 
         if score > 0:
 
+            score += len(chunk) / 1000
+
             scored_chunks.append(
                 (score, chunk)
             )
 
     scored_chunks.sort(
-        key=lambda x: x[0],
-        reverse=True
+        reverse=True,
+        key=lambda x: x[0]
     )
 
     return [
@@ -93,6 +95,8 @@ def extract_evidence(chunks):
 
     evidence = []
 
+    seen = set()
+
     for chunk in chunks:
 
         sentences = re.split(
@@ -104,7 +108,7 @@ def extract_evidence(chunks):
 
             sentence = sentence.strip()
 
-            if len(sentence) < 60:
+            if len(sentence) < 80:
                 continue
 
             sentence = re.sub(
@@ -113,16 +117,16 @@ def extract_evidence(chunks):
                 sentence
             )
 
-            evidence.append(
+            sentence = re.sub(
+                r"\s+",
+                " ",
                 sentence
             )
 
-    unique = []
+            if sentence not in seen:
 
-    for item in evidence:
+                seen.add(sentence)
 
-        if item not in unique:
+                evidence.append(sentence)
 
-            unique.append(item)
-
-    return unique[:10]
+    return evidence[:15]

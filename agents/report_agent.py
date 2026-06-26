@@ -7,124 +7,143 @@ class ReportAgent:
         self,
         query,
         documents,
-        plan
+        plan,
+        sections
     ):
 
         report = "# Research Report\n\n"
 
-        report += f"## Research Query\n\n{query}\n\n"
+        # -----------------------------------------
+        # Research Query
+        # -----------------------------------------
 
-        # -----------------------
+        report += "## Research Query\n\n"
+        report += f"{query}\n\n"
+
+        # -----------------------------------------
         # Research Plan
-        # -----------------------
+        # -----------------------------------------
 
         report += "## Research Plan\n\n"
 
         report += (
-            f"Original Query: "
-            f"{plan['original_query']}\n\n"
+            f"Original Query: {plan['original_query']}\n\n"
         )
 
         report += (
-            f"Clean Query: "
-            f"{plan['clean_query']}\n\n"
+            f"Total Sources Found: {plan['sources_found']}\n\n"
         )
 
-        report += (
-            f"Sources Found: "
-            f"{plan['sources_found']}\n\n"
-        )
+        report += "### Research Sub-Questions\n\n"
 
-        report += "Research Steps:\n\n"
-
-        for step in plan["steps"]:
-            report += f"- {step}\n"
+        for i, question in enumerate(
+            plan["sub_questions"],
+            start=1
+        ):
+            report += f"{i}. {question}\n"
 
         report += "\n"
 
-        # -----------------------
+        # -----------------------------------------
         # Executive Summary
-        # -----------------------
+        # -----------------------------------------
 
         report += "## Executive Summary\n\n"
 
         report += (
-            f"This report investigates "
-            f"'{query}'. "
-            f"{len(documents)} relevant documents "
-            f"were collected and analyzed.\n\n"
+            f"This report investigates **{query}**. "
+            f"The topic was divided into "
+            f"{len(plan['sub_questions'])} research "
+            f"sub-questions. Information was collected "
+            f"from multiple sources and processed using "
+            f"retrieval, ranking and verification agents.\n\n"
         )
 
-        # -----------------------
-        # Findings
-        # -----------------------
+        # -----------------------------------------
+        # Detailed Research
+        # -----------------------------------------
 
-        report += "## Key Findings\n\n"
+        report += "## Detailed Research\n\n"
 
-        all_evidence = []
-
-        for i, doc in enumerate(
-            documents,
+        for i, section in enumerate(
+            sections,
             start=1
         ):
 
-            report += (
-                f"### Source {i}\n\n"
-            )
+            report += f"### Question {i}\n\n"
 
             report += (
-                f"URL: {doc['source']}\n\n"
+                f"**{section['question']}**\n\n"
             )
 
-            for item in doc["evidence"]:
+            report += "#### Answer\n\n"
 
-                evidence_text = (
-                    item["evidence"]
-                )
+            answer = section["answer"].strip()
 
-                all_evidence.append(
-                    evidence_text
-                )
+            if answer == "":
+                answer = "No sufficient evidence found."
 
-                report += (
-                    f"- {evidence_text}\n"
-                )
+            report += answer + "\n\n"
 
-            report += "\n"
+            report += "#### Sources\n\n"
 
-        # -----------------------
+            if len(section["documents"]) == 0:
+
+                report += "No sources found.\n\n"
+
+            else:
+
+                for doc in section["documents"]:
+
+                    report += (
+                        f"- {doc['source']}\n"
+                    )
+
+                report += "\n"
+
+            report += "#### Top Evidence\n\n"
+
+            count = 1
+
+            for doc in section["documents"]:
+
+                for item in doc["evidence"][:3]:
+
+                    report += (
+                        f"{count}. {item['evidence']}\n\n"
+                    )
+
+                    count += 1
+
+        # -----------------------------------------
         # Combined Analysis
-        # -----------------------
+        # -----------------------------------------
 
-        report += (
-            "## Combined Analysis\n\n"
-        )
+        report += "## Combined Analysis\n\n"
 
-        report += (
-            f"The evidence gathered for "
-            f"'{query}' indicates:\n\n"
-        )
+        combined = ""
 
-        for evidence in all_evidence[:10]:
+        for section in sections:
 
-            report += (
-                f"- {evidence[:300]}\n"
-            )
+            combined += section["answer"] + "\n"
 
-        report += "\n"
+        report += combined[:3500]
 
-        # -----------------------
+        report += "\n\n"
+
+        # -----------------------------------------
         # Conclusion
-        # -----------------------
+        # -----------------------------------------
 
         report += "## Conclusion\n\n"
 
         report += (
-            f"Based on the collected "
-            f"information, the topic "
-            f"'{query}' was successfully "
-            f"researched using multiple "
-            f"sources.\n"
+            f"The research indicates that **{query}** "
+            f"can be understood through multiple perspectives "
+            f"including definition, history, concepts, "
+            f"applications and future developments. "
+            f"The collected evidence provides a comprehensive "
+            f"overview of the topic.\n"
         )
 
         os.makedirs(
@@ -132,16 +151,14 @@ class ReportAgent:
             exist_ok=True
         )
 
-        report_path = (
-            "reports/final_report.md"
-        )
+        report_path = "reports/final_report.md"
 
         with open(
             report_path,
             "w",
             encoding="utf-8"
-        ) as f:
+        ) as file:
 
-            f.write(report)
+            file.write(report)
 
         return report_path

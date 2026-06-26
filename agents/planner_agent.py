@@ -20,20 +20,53 @@ class PlannerAgent:
     def create_plan(self, query):
 
         prompt = f"""
-You are a Planner Agent.
+You are an expert Research Planner.
 
-Break the user query into 5 research sub-questions.
+Your task is to understand the user's intent and generate exactly FIVE research sub-questions that directly answer the user's query.
 
-Query:
+User Query:
 {query}
 
-Return only numbered questions.
+Instructions:
 
-Example:
+- First understand what the user is actually asking.
+- Do NOT always follow the same template.
+- Generate questions that help answer the user's query completely.
+- If the query is about the future, focus on future trends and opportunities.
+- If the query is about comparison, generate comparison questions.
+- If the query is about advantages or disadvantages, focus on those aspects.
+- If the query is a general topic, cover definition, history, concepts, applications and future.
+- Return ONLY numbered questions.
+- Do not include explanations or headings.
 
-1. What is AI?
-2. How does AI work?
-3. What are AI applications?
+Examples:
+
+User Query:
+What is Artificial Intelligence?
+
+1. What is Artificial Intelligence?
+2. What is the history of Artificial Intelligence?
+3. How does Artificial Intelligence work?
+4. What are the applications of Artificial Intelligence?
+5. What are the future developments of Artificial Intelligence?
+
+User Query:
+Is there a future scope in Data Analyst?
+
+1. What is the role of a Data Analyst?
+2. What is the current demand for Data Analysts?
+3. Which industries are expected to hire more Data Analysts in the future?
+4. What skills will Data Analysts need in the coming years?
+5. What is the future career scope and growth of Data Analysts?
+
+User Query:
+Compare Python and R.
+
+1. What are Python and R?
+2. What are the strengths of Python?
+3. What are the strengths of R?
+4. How do Python and R compare for data analysis?
+5. Which language is better for different use cases?
 """
 
         result = self.client.generate(prompt)
@@ -42,16 +75,44 @@ Example:
             not result
             or result.startswith("ERROR")
         ):
-            print(
-                "Planner failed. Using fallback plan."
-            )
 
-            return f"""
-1. Definition of {query}
-2. History of {query}
-3. Key concepts of {query}
-4. Applications of {query}
-5. Advantages and limitations of {query}
-"""
+            print("Planner failed. Using fallback plan.")
 
-        return result
+            return [
+                f"What is {query}?",
+                f"What is the history of {query}?",
+                f"How does {query} work?",
+                f"What are the applications of {query}?",
+                f"What are the advantages, limitations and future of {query}?"
+            ]
+
+        questions = []
+
+        for line in result.split("\n"):
+
+            line = line.strip()
+
+            if not line:
+                continue
+
+            if "." in line:
+
+                try:
+                    line = line.split(".", 1)[1].strip()
+                except Exception:
+                    pass
+
+            if line:
+                questions.append(line)
+
+        if len(questions) < 5:
+
+            questions = [
+                f"What is {query}?",
+                f"What is the history of {query}?",
+                f"How does {query} work?",
+                f"What are the applications of {query}?",
+                f"What are the advantages, limitations and future of {query}?"
+            ]
+
+        return questions[:5]

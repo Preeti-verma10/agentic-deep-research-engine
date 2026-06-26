@@ -9,7 +9,7 @@ def search_sources(query):
         "action": "query",
         "list": "search",
         "srsearch": query,
-        "srlimit": 10,
+        "srlimit": 8,
         "format": "json"
     }
 
@@ -26,20 +26,46 @@ def search_sources(query):
 
         data = response.json()
 
-        sources = []
-
         if "query" not in data:
             return []
+
+        sources = []
+
+        skip_words = [
+            "disambiguation",
+            ".ai",
+            "AI boom",
+            "AI bubble",
+            "AI slop",
+            "Ai",
+            "Outline of",
+            "Index of"
+        ]
 
         for item in data["query"]["search"]:
 
             title = item["title"]
 
+            skip = False
+
+            for word in skip_words:
+
+                if word.lower() in title.lower():
+                    skip = True
+                    break
+
+            if skip:
+                continue
+
             title = title.replace(" ", "_")
 
-            sources.append(
-                f"https://en.wikipedia.org/wiki/{title}"
+            url = (
+                "https://en.wikipedia.org/wiki/"
+                + title
             )
+
+            if url not in sources:
+                sources.append(url)
 
         return sources
 
