@@ -13,16 +13,16 @@ class ReportAgent:
 
         report = "# Research Report\n\n"
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Research Query
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Research Query\n\n"
         report += f"{query}\n\n"
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Research Plan
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Research Plan\n\n"
 
@@ -44,9 +44,9 @@ class ReportAgent:
 
         report += "\n"
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Executive Summary
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Executive Summary\n\n"
 
@@ -55,13 +55,28 @@ class ReportAgent:
             f"The topic was divided into "
             f"{len(plan['sub_questions'])} research "
             f"sub-questions. Information was collected "
-            f"from multiple sources and processed using "
-            f"retrieval, ranking and verification agents.\n\n"
+            f"from multiple sources, verified, ranked, "
+            f"and summarized using the Answer Agent.\n\n"
         )
 
-        # -----------------------------------------
+        # --------------------------------------------------
+        # Final Answer
+        # --------------------------------------------------
+
+        report += "## Final Answer\n\n"
+
+        combined_answers = []
+
+        for section in sections:
+            combined_answers.append(section["answer"])
+
+        report += "\n\n".join(combined_answers)
+
+        report += "\n\n"
+
+        # --------------------------------------------------
         # Detailed Research
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Detailed Research\n\n"
 
@@ -76,14 +91,11 @@ class ReportAgent:
                 f"**{section['question']}**\n\n"
             )
 
-            report += "#### Answer\n\n"
+            report += "#### AI Generated Answer\n\n"
 
-            answer = section["answer"].strip()
-
-            if answer == "":
-                answer = "No sufficient evidence found."
-
-            report += answer + "\n\n"
+            report += (
+                section["answer"] + "\n\n"
+            )
 
             report += "#### Sources\n\n"
 
@@ -115,36 +127,43 @@ class ReportAgent:
 
                     count += 1
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Combined Analysis
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Combined Analysis\n\n"
 
-        combined = ""
-
         for section in sections:
 
-            combined += section["answer"] + "\n"
+            report += (
+                f"### {section['question']}\n\n"
+            )
 
-        report += combined[:3500]
+            report += (
+                section["answer"] + "\n\n"
+            )
 
-        report += "\n\n"
-
-        # -----------------------------------------
+        # --------------------------------------------------
         # Conclusion
-        # -----------------------------------------
+        # --------------------------------------------------
 
         report += "## Conclusion\n\n"
 
         report += (
-            f"The research indicates that **{query}** "
-            f"can be understood through multiple perspectives "
-            f"including definition, history, concepts, "
-            f"applications and future developments. "
-            f"The collected evidence provides a comprehensive "
-            f"overview of the topic.\n"
+            f"The research on **{query}** was completed "
+            f"successfully using a multi-agent workflow. "
+            f"The Planner Agent generated research questions, "
+            f"the Research Agent collected information, the "
+            f"Retriever extracted relevant evidence, the "
+            f"Ranking and Verifier Agents evaluated the "
+            f"information, and the Answer Agent generated "
+            f"clear natural-language answers for each "
+            f"research question.\n"
         )
+
+        # --------------------------------------------------
+        # Save Report
+        # --------------------------------------------------
 
         os.makedirs(
             "reports",
