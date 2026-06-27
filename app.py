@@ -57,9 +57,46 @@ with st.sidebar:
 # --------------------------------------------------
 # Theme
 # --------------------------------------------------
+st.markdown(
+    """
+    <style>
+    /* Sidebar background */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(
+            135deg,
+            #EAF7F5,
+            #DFF2EE,
+            #E9F6F3
+        ) !important;
+    }
+
+    /* Chat history expander header */
+    section[data-testid="stSidebar"] .streamlit-expanderHeader {
+        background: rgba(255, 255, 255, 0.6) !important;
+        color: #0b2e1a !important;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    /* Expander content */
+    section[data-testid="stSidebar"] .streamlit-expanderContent {
+        background: rgba(255, 255, 255, 0.4) !important;
+        color: #0b2e1a !important;
+        border-radius: 0 0 10px 10px;
+    }
+
+    /* Remove dark blocks inside sidebar */
+    section[data-testid="stSidebar"] div {
+        background: transparent !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("""
 <style>
+
 
 header[data-testid="stHeader"]{
     background:transparent;
@@ -160,7 +197,6 @@ div[data-testid="stTextInput"] input{
 div[data-testid="stExpander"]{
 
     background:#f8fafc;
-
     border-radius:10px;
 }
 

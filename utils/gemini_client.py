@@ -31,64 +31,114 @@
 #                     time.sleep(5)
 
 #         return "ERROR: Gemini API failed after 3 attempts."
+# ----------------------------------------------------
+
+# from google import genai
+# import time
 
 
-from google import genai
+# class GeminiClient:
+#     def __init__(
+#         self,
+#         api_key: str,
+#         model: str = "gemini-2.5-flash",
+#         max_retries: int = 3,
+#         retry_delay: int = 5,
+#     ):
+#         """
+#         Initialize Gemini client.
+
+#         Args:
+#             api_key: Gemini API key.
+#             model: Gemini model name.
+#             max_retries: Number of retry attempts.
+#             retry_delay: Delay (seconds) between retries.
+#         """
+#         self.client = genai.Client(api_key=api_key)
+#         self.model = model
+#         self.max_retries = max_retries
+#         self.retry_delay = retry_delay
+
+#     def generate(self, prompt: str) -> str:
+#         """
+#         Generate a response from Gemini.
+
+#         Args:
+#             prompt: Input prompt.
+
+#         Returns:
+#             Generated text or an error message.
+#         """
+
+#         for attempt in range(self.max_retries):
+#             try:
+#                 response = self.client.models.generate_content(
+#                     model=self.model,
+#                     contents=prompt,
+#                 )
+
+#                 if hasattr(response, "text") and response.text:
+#                     return response.text.strip()
+
+#                 return str(response)
+
+#             except Exception as e:
+#                 print(
+#                     f"Gemini Error (Attempt {attempt + 1}/{self.max_retries}): {e}"
+#                 )
+
+#                 if attempt < self.max_retries - 1:
+#                     print(f"Retrying in {self.retry_delay} seconds...")
+#                     time.sleep(self.retry_delay)
+
+#         return "ERROR: Gemini API failed after all retry attempts."
+
+import os
 import time
+from google import genai
 
 
 class GeminiClient:
+
     def __init__(
         self,
-        api_key: str,
-        model: str = "gemini-2.5-flash",
-        max_retries: int = 3,
-        retry_delay: int = 5,
+        api_key,
+        model="gemini-2.5-flash",
+        max_retries=3,
+        retry_delay=5
     ):
-        """
-        Initialize Gemini client.
 
-        Args:
-            api_key: Gemini API key.
-            model: Gemini model name.
-            max_retries: Number of retry attempts.
-            retry_delay: Delay (seconds) between retries.
-        """
-        self.client = genai.Client(api_key=api_key)
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY not found."
+            )
+
+        self.client = genai.Client(
+            api_key=api_key
+        )
+
         self.model = model
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-    def generate(self, prompt: str) -> str:
-        """
-        Generate a response from Gemini.
-
-        Args:
-            prompt: Input prompt.
-
-        Returns:
-            Generated text or an error message.
-        """
+    def generate(self, prompt):
 
         for attempt in range(self.max_retries):
+
             try:
+
                 response = self.client.models.generate_content(
                     model=self.model,
-                    contents=prompt,
+                    contents=prompt
                 )
 
-                if hasattr(response, "text") and response.text:
-                    return response.text.strip()
-
-                return str(response)
+                return response.text.strip()
 
             except Exception as e:
-                print(
-                    f"Gemini Error (Attempt {attempt + 1}/{self.max_retries}): {e}"
-                )
+
+                print(f"Gemini Error: {e}")
 
                 if attempt < self.max_retries - 1:
-                    print(f"Retrying in {self.retry_delay} seconds...")
                     time.sleep(self.retry_delay)
 
-        return "ERROR: Gemini API failed after all retry attempts."
+        return None
