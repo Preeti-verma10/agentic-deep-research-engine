@@ -53,9 +53,9 @@ class AnswerAgent:
         prompt = f"""
 You are an expert research assistant.
 
-Use ONLY the evidence provided.
+Answer the question ONLY using the evidence below.
 
-Research Question:
+Question:
 {question}
 
 Evidence:
@@ -63,16 +63,18 @@ Evidence:
 
 Instructions:
 
-- Write naturally.
-- Explain in simple English.
+- Give ONE direct answer.
 - Merge repeated information.
-- Do not copy every sentence.
+- Ignore duplicate evidence.
+- Do not copy sentences exactly.
+- Explain naturally like ChatGPT.
+- Use simple English.
+- Keep the answer between 80 and 120 words.
+- Never mention "Evidence says..." or "According to the evidence..."
+- If information is incomplete, mention that briefly.
 - Do not invent facts.
-- Mention if evidence is incomplete.
-- Keep the answer between 100 and 150 words.
-- Answer like ChatGPT.
 
-Final Answer:
+Answer:
 """
 
         answer = self.client.generate(prompt)
@@ -86,17 +88,17 @@ Final Answer:
 
                 return "\n".join(
                     item["evidence"]
-                    for item in evidence_list[:5]
+                    for item in evidence_list[:3]
                 )
 
             return "\n".join(
-                evidence_list[:5]
+                evidence_list[:3]
             )
 
         return answer.strip()
 
     # --------------------------------------------------
-    # Final answer for ORIGINAL USER QUESTION
+    # Final Answer for Original User Query
     # --------------------------------------------------
 
     def generate_final_answer(
@@ -112,11 +114,6 @@ Final Answer:
             if isinstance(section, dict):
 
                 combined += (
-                    f"Question: {section['question']}\n"
-                )
-
-                combined += (
-                    f"Answer:\n"
                     f"{section['answer']}\n\n"
                 )
 
@@ -127,30 +124,48 @@ Final Answer:
                 )
 
         prompt = f"""
-You are an expert AI Research Assistant.
+You are ChatGPT.
 
 The user asked:
 
 {user_query}
 
-Below are answers generated from research.
+Below are research findings collected from reliable sources.
 
 Research Findings:
 
 {combined}
 
-Instructions:
+Your task is to answer ONLY the user's original question.
 
-- Answer ONLY the user's original question.
-- Combine all findings into one answer.
-- Do NOT mention Question 1, Question 2, etc.
-- Remove repetition.
+Requirements:
+
+- DO NOT mention Question 1, Question 2 or research findings.
+- DO NOT repeat information.
+- Give only ONE final answer.
 - Write naturally like ChatGPT.
-- Use short paragraphs.
-- Keep the answer between 120 and 180 words.
-- Be concise and informative.
-- Stay grounded in the research findings.
-- Do not invent facts.
+- Use Markdown formatting.
+
+Structure:
+
+## Short Introduction
+
+2-3 sentences.
+
+## Key Points
+
+- Bullet Point
+- Bullet Point
+- Bullet Point
+- Bullet Point
+
+## Conclusion
+
+1-2 sentences.
+
+Keep the total answer between 150 and 220 words.
+
+Do not invent facts outside the research findings.
 
 Final Answer:
 """
@@ -189,22 +204,22 @@ Final Answer:
             )
 
         prompt = f"""
-You are an AI Research Assistant.
+You are ChatGPT.
 
-Conversation History:
+Conversation:
 
 {history}
 
-User Follow-up Question:
+User:
 
 {followup_question}
 
 Instructions:
 
-- Use the conversation as context.
-- Resolve references like "it", "they", "this".
-- Answer naturally.
-- Keep the answer under 150 words.
+- Answer using the previous conversation.
+- Resolve references like "it", "they", or "this".
+- Be conversational.
+- Keep the answer below 120 words.
 - Do not invent unsupported facts.
 
 Answer:
