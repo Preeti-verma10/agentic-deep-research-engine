@@ -1,42 +1,29 @@
 import re
 
 
-def chunk_text(text, chunk_size=1200):
+def chunk_text(text, chunk_size=1800):
 
-    sentences = re.split(
-        r'(?<=[.!?])\s+',
-        text
-    )
+    sentences = re.split(r'(?<=[.!?])\s+', text)
 
     chunks = []
 
-    current_chunk = ""
+    current = ""
 
     for sentence in sentences:
 
-        if (
-            len(current_chunk)
-            + len(sentence)
-            < chunk_size
-        ):
+        if len(current) + len(sentence) < chunk_size:
 
-            current_chunk += sentence + " "
+            current += sentence + " "
 
         else:
 
-            chunks.append(
-                current_chunk.strip()
-            )
+            chunks.append(current.strip())
 
-            current_chunk = (
-                sentence + " "
-            )
+            current = sentence + " "
 
-    if current_chunk:
+    if current:
 
-        chunks.append(
-            current_chunk.strip()
-        )
+        chunks.append(current.strip())
 
     return chunks
 
@@ -48,46 +35,72 @@ def retrieve_relevant_chunks(
 ):
 
     query_words = set(
-        re.findall(
-            r"\w+",
-            query.lower()
-        )
+        re.findall(r"\w+", query.lower())
     )
 
-    scored_chunks = []
+    scored = []
 
     for chunk in chunks:
 
-        chunk_words = set(
-            re.findall(
-                r"\w+",
-                chunk.lower()
-            )
+        chunk_lower = chunk.lower()
+
+        words = set(
+            re.findall(r"\w+", chunk_lower)
         )
 
-        score = len(
-            query_words.intersection(
-                chunk_words
-            )
+        keyword_score = len(
+            query_words.intersection(words)
         )
+
+        phrase_bonus = 0
+
+        if query.lower() in chunk_lower:
+            phrase_bonus += 8
+
+        if "definition" in query.lower() and "definition" in chunk_lower:
+            phrase_bonus += 3
+
+        if "history" in query.lower() and "history" in chunk_lower:
+            phrase_bonus += 3
+
+        if "application" in query.lower() and "application" in chunk_lower:
+            phrase_bonus += 3
+
+        if "future" in query.lower() and "future" in chunk_lower:
+            phrase_bonus += 3
+
+        if "advantage" in query.lower() and "advantage" in chunk_lower:
+            phrase_bonus += 3
+
+        if "limitation" in query.lower() and "limitation" in chunk_lower:
+            phrase_bonus += 3
+
+        score = keyword_score + phrase_bonus
 
         if score > 0:
 
-            score += len(chunk) / 1000
+            scored.append(
 
-            scored_chunks.append(
-                (score, chunk)
+                (
+                    score,
+                    chunk
+                )
+
             )
 
-    scored_chunks.sort(
-        reverse=True,
-        key=lambda x: x[0]
+    scored.sort(
+        key=lambda x: x[0],
+        reverse=True
     )
 
     return [
+
         chunk
+
         for score, chunk
-        in scored_chunks[:top_k]
+
+        in scored[:top_k]
+
     ]
 
 
@@ -100,33 +113,54 @@ def extract_evidence(chunks):
     for chunk in chunks:
 
         sentences = re.split(
+
             r'(?<=[.!?])\s+',
+
             chunk
+
         )
 
         for sentence in sentences:
 
             sentence = sentence.strip()
 
-            if len(sentence) < 80:
+            if len(sentence) < 60:
+                continue
+
+            if len(sentence) > 280:
                 continue
 
             sentence = re.sub(
+
                 r"\[\d+\]",
+
                 "",
+
                 sentence
+
             )
 
             sentence = re.sub(
+
                 r"\s+",
+
                 " ",
+
                 sentence
+
             )
 
-            if sentence not in seen:
+            lower = sentence.lower()
 
-                seen.add(sentence)
+            if lower in seen:
+                continue
 
-                evidence.append(sentence)
+            seen.add(lower)
 
-    return evidence[:15]
+            evidence.append({
+
+                "evidence": sentence
+
+            })
+
+    return evidence[:12]

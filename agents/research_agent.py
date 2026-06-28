@@ -33,10 +33,7 @@ class ResearchAgent:
 
         print("\nResearch Plan:\n")
 
-        for i, question in enumerate(
-            sub_questions,
-            start=1
-        ):
+        for i, question in enumerate(sub_questions, start=1):
             print(f"{i}. {question}")
 
         ranking_agent = RankingAgent()
@@ -48,19 +45,16 @@ class ResearchAgent:
 
         total_sources = 0
 
-        # -----------------------------------
-        # Research each sub-question
-        # -----------------------------------
+        # ==========================================
+        # Research Every Question
+        # ==========================================
 
-        for index, question in enumerate(
-            sub_questions,
-            start=1
-        ):
+        for index, question in enumerate(sub_questions, start=1):
 
-            print("\n" + "=" * 60)
+            print("\n" + "=" * 70)
             print(f"Researching Question {index}")
             print(question)
-            print("=" * 60)
+            print("=" * 70)
 
             sources = search_sources(question)
 
@@ -68,7 +62,7 @@ class ResearchAgent:
 
             documents = []
 
-            all_verified_evidence = []
+            all_verified = []
 
             for url in sources:
 
@@ -109,61 +103,111 @@ class ResearchAgent:
                         ranked
                     )
 
-                    doc = {
+                    # Keep only verified evidence
+                    verified = [
+                        item
+                        for item in verified
+                        if item["verification_status"] != "Unverified"
+                    ]
+
+                    # Keep only top 5 evidence from each page
+                    verified = verified[:5]
+
+                    documents.append({
 
                         "source": url,
 
-                        "content": text[:3000],
+                        "content": text[:2500],
 
                         "chunks": relevant_chunks,
 
                         "evidence": verified
 
-                    }
+                    })
 
-                    documents.append(doc)
+                    total_documents.append({
 
-                    total_documents.append(doc)
+                        "source": url,
 
-                    all_verified_evidence.extend(
-                        verified
-                    )
+                        "content": text[:2500]
+
+                    })
+
+                    all_verified.extend(verified)
 
                 except Exception as e:
 
                     print(f"Failed: {url}")
+
                     print(e)
 
-            # -----------------------------------
-            # AI Answer for this sub-question
-            # -----------------------------------
+            # ==========================================
+            # Remove duplicate evidence
+            # ==========================================
+
+            unique = []
+
+            seen = set()
+
+            for item in all_verified:
+
+                text = item["evidence"].strip()
+
+                key = text.lower()
+
+                if key in seen:
+                    continue
+
+                seen.add(key)
+
+                unique.append(item)
+
+            # ==========================================
+            # Sort by confidence
+            # ==========================================
+
+            unique.sort(
+
+                key=lambda x: x["confidence"],
+
+                reverse=True
+
+            )
+
+            # ==========================================
+            # Send only best evidence to Gemini
+            # ==========================================
+
+            best_evidence = unique[:8]
 
             answer = answer_agent.generate_answer(
+
                 question,
-                all_verified_evidence
-            )
 
-            report_sections.append(
-
-                {
-
-                    "question": question,
-
-                    "answer": answer,
-
-                    "documents": documents
-
-                }
+                best_evidence
 
             )
 
-        # -----------------------------------
-        # FINAL ANSWER FOR USER QUERY
-        # -----------------------------------
+            report_sections.append({
+
+                "question": question,
+
+                "answer": answer,
+
+                "documents": documents
+
+            })
+
+        # ==========================================
+        # Final User Answer
+        # ==========================================
 
         final_answer = answer_agent.generate_final_answer(
+
             query,
+
             report_sections
+
         )
 
         print("\nResearch Completed.")

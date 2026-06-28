@@ -2,18 +2,26 @@
 
 ## Question
 
-What is Bluebeam Technology?
+Explain cyber security. And it's future scope.
 
 ## Answer
 
-He is mostly known for his promotion of theProject Blue Beamconspiracy theory, which posits a plot to facilitate a totalitarianworld governmentby destroyingAbrahamic religionsand replacing them with aNew Agebelief system using futuristicNASAtechnology and involving a faked alien invasion or fake extraterrestrial encounter meant to deceive nations into uniting under a new world government. In the early 1990s, he started writing on the theme of theNew World Orderand conspiracies hatched bysecret societies, being particularly inspired by the works ofWilliam Guy Carr.[citation needed] In 1994, he publishedProject Blue Beam (NASA), in which he detailed his claim thatNASA, with the help of theUnited Nations, was attempting to implement aNew Agereligionwith theAntichristat its head and start a New World Order, via a technologically simulatedSecond Coming of Christ.[citation needed]He also gave talks on this topic.[better source needed]CartoonistChristopher Knowlesnotedthe similarity of Project Blue Beam to the plots ofGene Roddenberry's unproduced 1975Star TrekscreenplayThe God Thingand the 1991Star Trek: The Next Generationepisode "Devil's Due".
+Drawing from their insights, this article explores how AI is used in cybersecurity, the risks it introduces, and how organizations can prepare for what comes next.
+In this article, we’ll explore what cybersecurity is, the significance of cybersecurity for businesses, and the various job opportunities available with a cybersecurity degree.
+Cybersecurity is the process of protecting networks, systems, applications and digital assets from unauthorized access, cyberattacks, malware and data breaches.
 
-He is mostly known for his promotion of theProject Blue Beamconspiracy theory, which posits a plot to facilitate a totalitarianworld governmentby destroyingAbrahamic religionsand replacing them with aNew Agebelief system using futuristicNASAtechnology and involving a faked alien invasion or fake extraterrestrial encounter meant to deceive nations into uniting under a new world government. In the early 1990s, he started writing on the theme of theNew World Orderand conspiracies hatched bysecret societies, being particularly inspired by the works ofWilliam Guy Carr.[citation needed] In 1994, he publishedProject Blue Beam (NASA), in which he detailed his claim thatNASA, with the help of theUnited Nations, was attempting to implement aNew Agereligionwith theAntichristat its head and start a New World Order, via a technologically simulatedSecond Coming of Christ.[citation needed]He also gave talks on this topic.[better source needed]CartoonistChristopher Knowlesnotedthe similarity of Project Blue Beam to the plots ofGene Roddenberry's unproduced 1975Star TrekscreenplayThe God Thingand the 1991Star Trek: The Next Generationepisode "Devil's Due".
-In 1995, he published his most detailed work,Les Protocoles de Toronto (6.6.6), modelled uponThe Protocols of the Elders of Zion, wherein he said aMasonicgroup called "6.6.6" had, for twenty years, been gathering the world's powerful to establish the New World Order andcontrol the mindsof individuals.[citation needed] He died of a heart attack in his home in December 1996,at age 51.
-Copies of his works still circulate on the Internet, and have influenced such later conspiracy theorists as AmericanevangelicalpreacherTexe Marrs.
+But there is a lot of hints we can glean from the present situation, enough to map out expectations for the new year and the future direction of cybersecurity.
+What does the future of cybersecurity hold, and how can organizations stay ahead?
+Future of Cybersecurity People are the New Perimeter With the workforce of the corporate world growing more dispersed as the months pass, safeguarding data is more about protecting endpoints and the people who control them.
 
-No sufficient evidence was found to answer this research question.
+From AI-generated phishing emails and deepfakes to more advanced forms of malware, these technologies are making cyber threats faster, more targeted, and more difficult to detect.
+To better understand how AI is shaping the cybersecurity landscape, Harvard Extension School convened a panel of chief information security officers (CISOs) and cybersecurity leaders to share their perspectives.
+Drawing from their insights, this article explores how AI is used in cybersecurity, the risks it introduces, and how organizations can prepare for what comes next.
 
-No sufficient evidence was found to answer this research question.
+From AI-generated phishing emails and deepfakes to more advanced forms of malware, these technologies are making cyber threats faster, more targeted, and more difficult to detect.
+To better understand how AI is shaping the cybersecurity landscape, Harvard Extension School convened a panel of chief information security officers (CISOs) and cybersecurity leaders to share their perspectives.
+Drawing from their insights, this article explores how AI is used in cybersecurity, the risks it introduces, and how organizations can prepare for what comes next.
 
-No sufficient evidence was found to answer this research question.
+But there is a lot of hints we can glean from the present situation, enough to map out expectations for the new year and the future direction of cybersecurity.
+Future of Cybersecurity People are the New Perimeter With the workforce of the corporate world growing more dispersed as the months pass, safeguarding data is more about protecting endpoints and the people who control them.
+Organizations cannot afford to rely on firewalls nowadays that most data is stored on the cloud and there are several endpoints instead of a few data centers.

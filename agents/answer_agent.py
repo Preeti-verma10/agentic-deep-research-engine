@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-
 from utils.gemini_client import GeminiClient
 
 load_dotenv()
@@ -15,7 +14,7 @@ class AnswerAgent:
         self.client = GeminiClient(api_key)
 
     # --------------------------------------------------
-    # Generate answer for one research question
+    # Generate answer for ONE research question
     # --------------------------------------------------
 
     def generate_answer(
@@ -27,11 +26,10 @@ class AnswerAgent:
         if not evidence_list:
 
             return (
-                "No sufficient evidence was found "
-                "to answer this research question."
+                "No reliable information was found for this research question."
             )
 
-        evidence_text = ""
+        evidence = ""
 
         for i, item in enumerate(
             evidence_list,
@@ -39,40 +37,50 @@ class AnswerAgent:
         ):
 
             if isinstance(item, dict):
-                evidence = item.get(
-                    "evidence",
-                    ""
-                )
-            else:
-                evidence = str(item)
 
-            evidence_text += (
-                f"{i}. {evidence}\n"
-            )
+                evidence += (
+                    f"{i}. {item.get('evidence','')}\n"
+                )
+
+            else:
+
+                evidence += (
+                    f"{i}. {item}\n"
+                )
 
         prompt = f"""
-You are an expert research assistant.
+You are an expert AI Research Assistant.
 
-Answer the question ONLY using the evidence below.
+Answer ONLY the question below.
 
 Question:
+
 {question}
 
-Evidence:
-{evidence_text}
+Reliable Evidence:
+
+{evidence}
 
 Instructions:
 
-- Give ONE direct answer.
-- Merge repeated information.
-- Ignore duplicate evidence.
-- Do not copy sentences exactly.
+- Read ALL evidence carefully.
+- Ignore duplicated facts.
+- Merge similar information.
 - Explain naturally like ChatGPT.
-- Use simple English.
-- Keep the answer between 80 and 120 words.
-- Never mention "Evidence says..." or "According to the evidence..."
-- If information is incomplete, mention that briefly.
-- Do not invent facts.
+- Use ONLY the provided evidence.
+- Do NOT copy sentences exactly.
+- Do NOT mention "According to the evidence".
+- If information is missing, say so briefly.
+- Answer ONLY this question.
+- Ignore information unrelated to this question.
+
+Write between 200 and 400 words.
+
+Use Markdown.
+
+Good Answer Example:
+
+Machine Learning (ML) is a branch of Artificial Intelligence that enables computers to learn patterns from data without being explicitly programmed. Instead of following fixed rules, ML models improve their performance by analyzing examples and making predictions. It is widely used in recommendation systems, fraud detection, image recognition, and language processing.
 
 Answer:
 """
@@ -80,25 +88,29 @@ Answer:
         answer = self.client.generate(prompt)
 
         if (
-            not answer
+            answer is None
             or answer.startswith("ERROR")
         ):
 
             if isinstance(evidence_list[0], dict):
 
                 return "\n".join(
+
                     item["evidence"]
+
                     for item in evidence_list[:3]
+
                 )
 
             return "\n".join(
+
                 evidence_list[:3]
+
             )
 
         return answer.strip()
-
     # --------------------------------------------------
-    # Final Answer for Original User Query
+    # Generate Final Answer for User Query
     # --------------------------------------------------
 
     def generate_final_answer(
@@ -107,82 +119,88 @@ Answer:
         section_answers
     ):
 
-        combined = ""
+        findings = ""
 
         for section in section_answers:
 
-            if isinstance(section, dict):
+            findings += f"""
 
-                combined += (
-                    f"{section['answer']}\n\n"
-                )
+Question:
+{section['question']}
 
-            else:
+Answer:
+{section['answer']}
 
-                combined += (
-                    str(section) + "\n\n"
-                )
+"""
 
         prompt = f"""
 You are ChatGPT.
 
-The user asked:
+The user originally asked:
 
 {user_query}
 
-Below are research findings collected from reliable sources.
+Below are answers collected from multiple research tasks.
 
-Research Findings:
+Research:
 
-{combined}
+{findings}
 
-Your task is to answer ONLY the user's original question.
+Your job is to answer ONLY the user's original question.
 
-Requirements:
+Rules:
 
-- DO NOT mention Question 1, Question 2 or research findings.
-- DO NOT repeat information.
-- Give only ONE final answer.
-- Write naturally like ChatGPT.
-- Use Markdown formatting.
+- Do NOT mention Question 1, Question 2, Topic 1 or research tasks.
+- Merge all information naturally.
+- Remove duplicate information.
+- Remove unnecessary details.
+- Write like ChatGPT.
+- Use simple English.
+- Do NOT copy the research answers.
+- Rewrite everything naturally.
+- Stay factual.
+- Do NOT invent facts.
+- If some information is unavailable, simply omit it.
 
-Structure:
+Use this format exactly.
 
-## Short Introduction
+# Introduction
 
-2-3 sentences.
+Write 2–3 sentences introducing the topic.
 
-## Key Points
+# Key Points
 
-- Bullet Point
-- Bullet Point
-- Bullet Point
-- Bullet Point
+• Use 5–8 bullet points.
 
-## Conclusion
+• Each bullet should be 1–3 sentences.
 
-1-2 sentences.
+# Conclusion
 
-Keep the total answer between 150 and 220 words.
+Summarize everything in 2–3 sentences.
 
-Do not invent facts outside the research findings.
+Keep the total answer around 250–500 words.
 
-Final Answer:
+Return ONLY the final answer.
 """
 
         final_answer = self.client.generate(prompt)
 
         if (
-            not final_answer
+            final_answer is None
             or final_answer.startswith("ERROR")
         ):
 
-            return combined.strip()
+            return "\n\n".join(
+
+                section["answer"]
+
+                for section in section_answers
+
+            )
 
         return final_answer.strip()
-
-    # --------------------------------------------------
-    # Follow-up Chat
+            # --------------------------------------------------
+    # Follow-up Conversation
     # --------------------------------------------------
 
     def answer_followup(
@@ -195,32 +213,39 @@ Final Answer:
 
         for chat in chat_history:
 
-            history += (
-                f"User: {chat['question']}\n"
-            )
+            history += f"""
+User:
+{chat['question']}
 
-            history += (
-                f"Assistant: {chat['answer']}\n\n"
-            )
+Assistant:
+{chat['answer']}
+
+"""
 
         prompt = f"""
 You are ChatGPT.
+
+Below is the previous conversation.
 
 Conversation:
 
 {history}
 
-User:
+The user now asks:
 
 {followup_question}
 
 Instructions:
 
-- Answer using the previous conversation.
-- Resolve references like "it", "they", or "this".
-- Be conversational.
-- Keep the answer below 120 words.
-- Do not invent unsupported facts.
+- Use the previous conversation as context.
+- Resolve references like "it", "they", "that", "this", etc.
+- If the answer exists in the conversation, answer using it.
+- If more explanation is helpful, expand naturally.
+- If the answer is not fully available in the conversation, use your general knowledge.
+- Be conversational and helpful.
+- Keep the answer between 80 and 150 words.
+- Use simple English.
+- Do not mention "conversation history" or "context".
 
 Answer:
 """
@@ -228,12 +253,12 @@ Answer:
         answer = self.client.generate(prompt)
 
         if (
-            not answer
+            answer is None
             or answer.startswith("ERROR")
         ):
 
             return (
-                "Unable to generate a follow-up answer."
+                "Sorry, I couldn't generate a follow-up answer."
             )
 
         return answer.strip()
